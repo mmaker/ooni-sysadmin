@@ -38,7 +38,7 @@
     dest="/data/bridge_reachability/run.sh"
     owner="{{ ooni_user }}"
     group="{{ ooni_user }}"
-    mode=0644
+    mode=0744
 
 - name: get the hour as local time relative to midnight GMT
   shell: 'date "+%-H" -d "00:00:00 -0000"'
