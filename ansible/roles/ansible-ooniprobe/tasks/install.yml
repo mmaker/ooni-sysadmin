@@ -1,0 +1,8 @@
+---
+- name: install apt-gettable requirements for installing ooniprobe
+  apt:
+    pkg: "{{ item }}"
+    state: latest
+  with_items: ["libpcap0.8-dev", "libgeoip-dev", ]
+- name: Install ooniprobe via pip
+  pip: name="ooniprobe" state="latest"

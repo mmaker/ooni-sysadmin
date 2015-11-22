@@ -1,0 +1,74 @@
+---
+
+## yum installs
+- name: install dev tools group
+  shell: "yum -y groupinstall \"Development tools\""
+  sudo: yes
+
+- name: install more development dependencies
+  shell: "yum -y install zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel readline-devel tk-devel gdbm-devel db4-devel libpcap-devel libffi-devel screen libeven-devel unzip tor"
+  sudo: yes
+
+## setup temporary build directory
+- name: create tmp build directory
+  command: "mktemp -d"
+  register: tmp_install_dir
+
+- name: Display tmp_install_dir
+  debug: var=tmp_install_dir.stdout
+
+## maybe install python
+- name: check if new python is present
+  stat: "path={{ python_symlink }}"
+  register: new_python_st
+
+- include: planetlab_install_python.yml
+  when: not new_python_st.stat.exists
+
+## maybe install libtool
+- name: check if new libtool is present
+  stat: "path={{ libtool_symlink }}"
+  register: new_libtool_st
+
+- include: planetlab_install_libtool.yml
+  when: not new_libtool_st.stat.islnk
+
+## maybe install autoconf
+- name: check if new autoconf is present
+  stat: "path={{ autoconf_symlink }}"
+  register: new_autoconf_st
+
+- include: planetlab_install_autoconf.yml
+  when: not new_autoconf_st.stat.islnk
+
+## maybe install automake
+- name: check if new automake is present
+  stat: "path={{ automake_symlink }}"
+  register: new_automake_st
+
+- include: planetlab_install_automake.yml
+  when: not new_automake_st.stat.islnk
+
+## maybe install libevent
+- name: check if new libevent is present
+  stat: "path={{ libevent_symlink }}"
+  register: new_libevent_st
+
+- include: planetlab_install_libevent.yml
+#  when: new_libevent_st.stat.islnk is False
+
+## maybe install gmp
+- name: check if new gmp is present
+  stat: "path={{ gmp_symlink }}"
+  register: new_gmp_st
+
+- include: planetlab_install_gmp.yml
+  when: not new_gmp_st.stat.islnk
+
+## maybe install tor
+- name: check if new tor is present
+  stat: "path={{ tor_symlink }}"
+  register: new_tor_st
+
+- include: planetlab_install_tor.yml
+  when: not new_tor_st.stat.islnk

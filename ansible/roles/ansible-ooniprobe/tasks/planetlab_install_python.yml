@@ -1,0 +1,30 @@
+---
+
+## install python
+- name: get python source tarball
+  command: "wget -O {{ tmp_install_dir.stdout }}/{{ python_tarball }} {{ python_tarball_url }} --no-check-certificate"
+
+- name: python tarball checksum comparison
+  shell: "sha256sum {{ tmp_install_dir.stdout }}/{{ python_tarball }} | cut -d ' ' -f 1"
+  register: tarball_sha256sum
+
+- name: assert that the python tarball is sha256sum verified
+  assert:
+    that: "tarball_sha256sum.stdout == python_tarball_sha256sum"
+
+- name: extract python souce tarball
+  command: "tar xf {{ tmp_install_dir.stdout }}/{{ python_tarball }} --directory {{ tmp_install_dir.stdout }}"
+
+- name: configure python build
+  command: "chdir={{ tmp_install_dir.stdout }}/{{ python_dir }} ./configure --prefix=/usr/local --enable-unicode=ucs4 --enable-shared LDFLAGS=\"-Wl,-rpath /usr/local/lib\""
+
+- name: compile python
+  command: "chdir={{ tmp_install_dir.stdout }}/{{ python_dir }} make"
+
+- name: compile python
+  command: "chdir={{ tmp_install_dir.stdout }}/{{ python_dir }} make altinstall"
+  sudo: yes
+
+- name: symlink to new python
+  command: "ln -sf {{ python_bin }} {{ python_symlink }}"
+  sudo: yes
